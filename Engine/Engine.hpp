@@ -1,7 +1,7 @@
 #pragma once
 #include <string>
-#include "Template/GameDefines.hpp"
-#include "Template/PiecesOfCode.hpp"
+#include "RocketLeague/GameDefines.hpp"
+#include "RocketLeague/PiecesOfCode.hpp"
 
 /*
 # ========================================================================================= #
