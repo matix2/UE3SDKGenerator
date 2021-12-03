@@ -1558,6 +1558,7 @@ class UInterfaceProperty : public UProperty
 {
 public:
 	class UClass* InterfaceClass;		REGISTER_FIELD(class UClass*, InterfaceClass, EFieldIds::UINTERFACEPROPERTY_CLASS)	// 0x0058 (0x08)
+	uint8_t UnknownData00[0x8];
 
 public:
 	static UClass* StaticClass()
