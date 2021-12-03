@@ -32,16 +32,16 @@ namespace Configuration
     const std::string GObjectsString =                  "null";
     const uint8_t* GObjectsPattern =                    (uint8_t*)"null";
     const char* GObjectsMask =                          (char*)"null";
-    const uintptr_t GObjectsOffset =                    (uintptr_t)0x2270BC8;
+    const uintptr_t GObjectsOffset =                    (uintptr_t)0x21F0668;
 
     const std::string GNamesString =                    "null";
     const uint8_t* GNamesPattern =                      (uint8_t*)"null";
     const char* GNamesMask =                            (char*)"null";
-    const uintptr_t GNamesOffset =                      (uintptr_t)0x2270B80;
+    const uintptr_t GNamesOffset =                      (uintptr_t)0x21F0620;
 
     const std::string GameName =                        "Rocket League";
     const std::string GameNameShort =                   "RLSDK";
-    const std::string GameVersion =                     "2.08";
+    const std::string GameVersion =                     "2.09";
     const std::filesystem::path GeneratorDirectory =    "C:\\Users\\matias\\Desktop\\UE3SDKGenerator";
 }
 

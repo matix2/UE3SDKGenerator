@@ -188,18 +188,15 @@ enum class EFieldIds : uint8_t
 	FNAMEENTRY_NAME_UTF8,
 	UOBJECT_VFTABLE,
 	UOBJECT_INDEX,
-	UOBJECT_NETINDEX,
 	UOBJECT_OUTER,
 	UOBJECT_NAME,
 	UOBJECT_CLASS,
-	UOBJECT_ARCHETYPE,
 	UFIELD_NEXT,
 	UFIELD_SUPERFIELD,
 	UENUM_NAMES,
 	UCONST_VALUE,
 	UPROPERTY_DIMENSION,
 	UPROPERTY_SIZE,
-	UPROPERTY_PROPERTYSIZE,
 	UPROPERTY_FLAGS,
 	UPROPERTY_OFFSET,
 	USTRUCT_SUPERFIELD,
@@ -207,13 +204,6 @@ enum class EFieldIds : uint8_t
 	USTRUCT_SIZE,
 	UFUNCTION_FLAGS,
 	UFUNCTION_NATIVE,
-	UFUNCTION_REPOFFSET,
-	UFUNCTION_FRIENDLYNAME,
-	UFUNCTION_OPERPRECEDENCE,
-	UFUNCTION_NUMPARMS,
-	UFUNCTION_PARMSSIZE,
-	UFUNCTION_RETURNVALUEOFFSET,
-	UFUNCTION_FUNC,
 	USTRUCTPROPERTY_STRUCT,
 	UOBJECTPROPERTY_PROPERTY,
 	UCLASSPROPERTY_METACLASS,
@@ -688,24 +678,22 @@ namespace Fields
 */
 
 // FNameEntry
-// (0x0000 - 0x000C)
+// (0x0000 - 0x0016)
 struct FNameEntry
 {
 public:
-	uint64_t Flags;							// 0x0000 (0x08)
-	// uint8_t UnknownData00[0x8];  // 0x8
-	int32_t Index;							REGISTER_FIELD(int32_t, Index, EFieldIds::FNAMEENTRY_INDEX) // 0xC
-	uint8_t UnknownData01[0xC];
+	uint64_t Flags;																											// 0x0000 (0x08)
+	int32_t Index;							REGISTER_FIELD(int32_t, Index, EFieldIds::FNAMEENTRY_INDEX)						// 0x0008 (0x04)
+	uint8_t UnknownData01[0xC];																								// 0x000C (0x0C)
 
 #ifdef CHARACTER_UTF16
 	wchar_t			Name[0x400];				REGISTER_FIELD(wchar_t, Name, EFieldIds::FNAMEENTRY_NAME_UTF16)					// 0x0018 (0x00)
 #endif
 #ifdef CHARACTER_UTF8
-	char			Name[0x400];			REGISTER_FIELD(wchar_t, Name, EFieldIds::FNAMEENTRY_NAME_UTF8)					// 0x000C (0x00)
+	char			Name[0x400];			REGISTER_FIELD(wchar_t, Name, EFieldIds::FNAMEENTRY_NAME_UTF8)					// 0x0018 (0x00)
 #endif
 
 public:
-	
 	int32_t GetIndex() const
 	{
 		return Index;
@@ -1063,10 +1051,9 @@ public:
 };
 
 // FScriptDelegate [This struct is game dependent, don't forget to reverse its contents or just its size!]
-// (0x0000 - 0x0009)
+// (0x0000 - 0x0018)
 struct FScriptDelegate
 {
-	// class UObject* Object;				// 0x0000 (0x08)
 	uint8_t UnknownData[0x18];			// 0x0000 (0x18)
 };
 
@@ -1088,18 +1075,24 @@ struct FQWord
 */
 
 // Class Core.Object
-// (0x0000 - 0x0034)
+// (0x0000 - 0x0058)
 class UObject
 {
 public:
 	struct FPointer VfTableObject;		REGISTER_FIELD(FPointer, VfTableObject, EFieldIds::UOBJECT_VFTABLE)				// 0x0000 (0x08)
-	uint8_t UnknownData00[0x30];
-	int32_t ObjectInternalInteger;		REGISTER_FIELD(int32_t, ObjectInternalInteger, EFieldIds::UOBJECT_INDEX)		// 0x0018 (0x04)
-	int32_t NetIndex;					REGISTER_FIELD(int32_t, NetIndex, EFieldIds::UOBJECT_NETINDEX)
-	class UObject* Outer;				REGISTER_FIELD(class UObject*, Outer, EFieldIds::UOBJECT_OUTER)					// 0x001C (0x08)
-	struct FName Name;					REGISTER_FIELD(FName, Name, EFieldIds::UOBJECT_NAME)							// 0x0024 (0x08)
-	class UClass* Class;				REGISTER_FIELD(class UClass*, Class, EFieldIds::UOBJECT_CLASS)					// 0x002C (0x08)
-	class UObject* ObjectArchetype;     REGISTER_FIELD(class UObject*, ObjectArchetype, EFieldIds::UOBJECT_ARCHETYPE)
+	struct FPointer HashNext;																							// 0x0008 (0x08)
+	int64_t ObjectFlags;																								// 0x0010 (0x08)
+	struct FPointer HashOuterNext;																						// 0x0018 (0x08)
+	struct FPointer StateFrame;																							// 0x0020 (0x08)									
+	class UObject* Linker;																								// 0x0028 (0x08)
+	struct FPointer LinkerIndex;																						// 0x0030 (0x08)
+	int32_t ObjectInternalInteger;		REGISTER_FIELD(int32_t, ObjectInternalInteger, EFieldIds::UOBJECT_INDEX)		// 0x0038 (0x04)
+	int32_t NetIndex;																									// 0x003C (0x04)
+	class UObject* Outer;				REGISTER_FIELD(class UObject*, Outer, EFieldIds::UOBJECT_OUTER)					// 0x0040 (0x08)
+	struct FName Name;					REGISTER_FIELD(FName, Name, EFieldIds::UOBJECT_NAME)							// 0x0048 (0x08)																					// 0x004C (0x08)
+	class UClass* Class;				REGISTER_FIELD(class UClass*, Class, EFieldIds::UOBJECT_CLASS)					// 0x0050 (0x08)
+	class UObject* ObjectArchetype;																						// 0x0058 (0x08)
+
 
 public:
 	static UClass* StaticClass()
@@ -1163,14 +1156,13 @@ public:
 	bool IsA(int32_t objInternalInteger);
 };
 
- //Class Core.Field
+// Class Core.Field
 // 0x0010 (0x0034 - 0x0044)
 class UField : public UObject
 {
 public:
 	class UField* Next;					REGISTER_FIELD(class UField*, Next, EFieldIds::UFIELD_NEXT)						// 0x0034 (0x08)
 	uint8_t UnknownData00[0x8];
-	// class UField* SuperField;			REGISTER_FIELD(class UField*, SuperField, EFieldIds::UFIELD_SUPERFIELD)			// 0x003C (0x08) [SUPERFIELD CAN EITHER BE HERE, OR IN USTRUCT DPENDING ON THE GAME. COMMENT OUT ACCORDINGLY!]
 
 public:
 	static UClass* StaticClass()
@@ -1191,7 +1183,7 @@ public:
 class UEnum : public UField
 {
 public:
-	TArray<struct FName> Names;				REGISTER_FIELD(TArray<struct FName>, Names, EFieldIds::UENUM_NAMES)				// 0x0044 (0x10)
+	TArray<struct FName> Names;			REGISTER_FIELD(TArray<struct FName>, Names, EFieldIds::UENUM_NAMES)				// 0x0044 (0x10)
 
 public:
 	static UClass* StaticClass()
@@ -1236,11 +1228,11 @@ public:
 	unsigned long ArrayDim;				REGISTER_FIELD(unsigned long, ArrayDim, EFieldIds::UPROPERTY_DIMENSION)			// 0x0044 (0x04)
 	unsigned long ElementSize;			REGISTER_FIELD(unsigned long, ElementSize, EFieldIds::UPROPERTY_SIZE)			// 0x0048 (0x04)
 	uint64_t PropertyFlags;				REGISTER_FIELD(unsigned long, PropertyFlags, EFieldIds::UPROPERTY_FLAGS)		// 0x004C (0x08)
-	uint8_t UnknownData00[0x10];
-	uint32_t PropertySize;				REGISTER_FIELD(uint32_t, PropertySize, EFieldIds::UPROPERTY_PROPERTYSIZE)
-	uint8_t UnknownData01[0x4];
-	unsigned long Offset;				REGISTER_FIELD(unsigned long, Offset, EFieldIds::UPROPERTY_OFFSET)				// 0x0054 (0x04)
-	uint8_t UnknownData02[0x2C];
+	uint8_t UnknownData00[0x10];																					    // 0x0054 (0x10)
+	uint32_t PropertySize;																							    // 0x0058 (0x04)																						
+	uint8_t UnknownData01[0x4];																							// 0x005C (0x04)
+	unsigned long Offset;				REGISTER_FIELD(unsigned long, Offset, EFieldIds::UPROPERTY_OFFSET)				// 0x0060 (0x04)
+	uint8_t UnknownData02[0x2C];																					    // 0x0064 (0x04)
 
 public:
 	static UClass* StaticClass()
@@ -1257,15 +1249,15 @@ public:
 };
 
 // Class Core.Struct
-// 0x0014 (0x0044 - 0x0058)
+// 0x0014 (0x0034 - 0x0058)
 class UStruct : public UField
 {
 public:
-	uint8_t UnknownData00[0x10];
-	class UField* SuperField;			REGISTER_FIELD(class UField*, SuperField, EFieldIds::USTRUCT_SUPERFIELD)		// 0x0044 (0x08) [SUPERFIELD CAN EITHER BE HERE, OR IN UFIELD DPENDING ON THE GAME. COMMENT OUT ACCORDINGLY!]
+	uint8_t UnknownData00[0x10];																						// 0x0034 (0x10)
+	class UField* SuperField;			REGISTER_FIELD(class UField*, SuperField, EFieldIds::USTRUCT_SUPERFIELD)		// 0x0044 (0x08)
 	class UField* Children;				REGISTER_FIELD(class UField*, Children, EFieldIds::USTRUCT_CHILDREN)			// 0x004C (0x08)
 	unsigned long PropertySize;			REGISTER_FIELD(unsigned long, PropertySize, EFieldIds::USTRUCT_SIZE)			// 0x0054 (0x04)
-	uint8_t UnknownData01[0x9C];
+	uint8_t UnknownData01[0x9C];																						// 0x0058 (0x9C)
 
 public:
 	static UClass* StaticClass()
@@ -1286,18 +1278,17 @@ public:
 class UFunction : public UStruct
 {
 public:
-	uint32_t FunctionFlags;				REGISTER_FIELD(uint64_t, FunctionFlags, EFieldIds::UFUNCTION_FLAGS)
-	uint16_t iNative;					REGISTER_FIELD(uint16_t, iNative, EFieldIds::UFUNCTION_NATIVE)
-	uint16_t RepOffset;					REGISTER_FIELD(uint16_t, RepOffset, EFieldIds::UFUNCTION_REPOFFSET)
-	uint8_t UnknownData00[0x4];
-	struct FName FriendlyName;			REGISTER_FIELD(struct FName, FriendlyName, EFieldIds::UFUNCTION_FRIENDLYNAME)
-	uint8_t OperPrecedence;				REGISTER_FIELD(uint8_t, OperPrecedence, EFieldIds::UFUNCTION_OPERPRECEDENCE)
-	uint8_t NumParms;					REGISTER_FIELD(uint8_t, NumParms, EFieldIds::UFUNCTION_NUMPARMS)
-	int16_t ParmsSize;					REGISTER_FIELD(int16_t, ParmsSize, EFieldIds::UFUNCTION_PARMSSIZE)
-	uint16_t ReturnValueOffset;			REGISTER_FIELD(uint16_t, ReturnValueOffset, EFieldIds::UFUNCTION_RETURNVALUEOFFSET)
-	uint8_t UnknownData01[0xE];
-	void* Func;							REGISTER_FIELD(void*, Func, EFieldIds::UFUNCTION_FUNC)
-
+	uint64_t FunctionFlags;				REGISTER_FIELD(uint64_t, FunctionFlags, EFieldIds::UFUNCTION_FLAGS)				// 0x0058 (0x08)
+	uint16_t iNative;					REGISTER_FIELD(uint16_t, iNative, EFieldIds::UFUNCTION_NATIVE)					// 0x0060 (0x02)
+	uint16_t RepOffset;																									// 0x0062 (0x02)
+	struct FName FriendlyName;																							// 0x0064 (0x08)
+	uint8_t	OperatorPrecedence;																							// 0x006C (0x01)
+	uint8_t	NumParms;																									// 0x006D (0x01)
+	uint16_t ParmsSize;																									// 0x006E (0x02)
+	unsigned long ReturnValueOffset;																					// 0x0070 (0x04)
+	uint8_t	UnknownData00[0xC];																							// 0x0074 (0xC)
+	struct FPointer Func;																								// 0x0080 (0x08)
+													
 public:
 	static UClass* StaticClass()
 	{
@@ -1359,7 +1350,7 @@ public:
 class UClass : public UState
 {
 public:
-	uint8_t UnknownData00[0x288]; // 0x0058 (0x00) [USE THIS CLASSES PROPERTYSIZE IN RECLASS TO DETERMINE THE SIZE OF THE UNKNOWNDATA]
+	uint8_t UnknownData00[0x228]; // 0x0058 (0x00) [USE THIS CLASSES PROPERTYSIZE IN RECLASS TO DETERMINE THE SIZE OF THE UNKNOWNDATA]
 public:
 	static UClass* StaticClass()
 	{
@@ -1567,7 +1558,6 @@ class UInterfaceProperty : public UProperty
 {
 public:
 	class UClass* InterfaceClass;		REGISTER_FIELD(class UClass*, InterfaceClass, EFieldIds::UINTERFACEPROPERTY_CLASS)	// 0x0058 (0x08)
-	uint8_t UnknownData00[0x8];
 
 public:
 	static UClass* StaticClass()
@@ -1607,9 +1597,7 @@ public:
 class UDelegateProperty : public UProperty
 {
 public:
-	class UFuncton* Function;			REGISTER_FIELD(class UFuncton*, Function, EFieldIds::UDELEGATEPROPERTY_FUNCTION)		// 0x0058 (0x08)
-	struct FName DelegateName;			REGISTER_FIELD(FName, DelegateName, EFieldIds::UDELEGATEPROPERTY_NAME)					// 0x0060 (0x08)
-	// uint8_t UnknownData00[0x10];
+	uint8_t UnknownData00[0x10];
 
 public:
 	static UClass* StaticClass()

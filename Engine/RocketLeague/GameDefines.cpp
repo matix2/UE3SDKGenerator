@@ -81,8 +81,8 @@ namespace Fields
 	{
 		switch (fieldId)
 		{
-		/*case EFieldIds::FNAMEENTRY_INDEX:
-			return offsetof(FNameEntry, Index);*/
+		case EFieldIds::FNAMEENTRY_INDEX:
+			return offsetof(FNameEntry, Index);
 		case EFieldIds::FNAMEENTRY_NAME_UTF16:
 			return offsetof(FNameEntry, Name);
 		case EFieldIds::FNAMEENTRY_NAME_UTF8:
@@ -135,10 +135,12 @@ namespace Fields
 			return offsetof(UMapProperty, Value);
 		case EFieldIds::UINTERFACEPROPERTY_CLASS:
 			return offsetof(UInterfaceProperty, InterfaceClass);
+		/* Not actually needed in sdk generation at the moment.
 		case EFieldIds::UDELEGATEPROPERTY_FUNCTION:
 			return offsetof(UDelegateProperty, Function);
 		case EFieldIds::UDELEGATEPROPERTY_NAME:
 			return offsetof(UDelegateProperty, DelegateName);
+		*/
 		case EFieldIds::UBYTEPROPERTY_ENUM:
 			return offsetof(UByteProperty, Enum);
 		case EFieldIds::UBOOLPROPERTY_BITMASK:

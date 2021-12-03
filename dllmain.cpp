@@ -2789,8 +2789,14 @@ namespace Generator
             {
                 uintptr_t entryPoint = Retrievers::GetEntryPoint();
 
+                uintptr_t GObjectsAddress = entryPoint + Configuration::GObjectsOffset;
+                uintptr_t GNamesAddress = entryPoint + Configuration::GNamesOffset;
+                GObjects = reinterpret_cast<TArray<UObject*>*>(GObjectsAddress);
+                GNames = reinterpret_cast<TArray<FNameEntry*>*>(GNamesAddress);
+
                 if (dumpNames)
                 {
+
                     std::ofstream file(fullDirectory / "NameDump.txt");
 
                     uintptr_t offset = Retrievers::GetOffset(reinterpret_cast<uintptr_t>(GNames));
@@ -2902,8 +2908,8 @@ namespace Generator
                 UMapProperty::RegKey();
                 UMapProperty::RegValue();
                 UInterfaceProperty::RegInterfaceClass();
-                UDelegateProperty::RegFunction(); // Not actually needed in sdk generation at the moment.
-                UDelegateProperty::RegDelegateName(); // Not actually needed in sdk generation at the moment.
+                //  UDelegateProperty::RegFunction(); // Not actually needed in sdk generation at the moment.
+                // UDelegateProperty::RegDelegateName(); // Not actually needed in sdk generation at the moment.
                 UByteProperty::RegEnum();
                 UBoolProperty::RegBitMask();
                 UArrayProperty::RegInner();
